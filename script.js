@@ -1,4 +1,5 @@
 const STORAGE_KEY = "matchingTilesHighestUnlockedLevel";
+const COMPLETED_KEY = "matchingTilesCompletedLevels";
 const UNLOCK_ALL_FOR_TESTING = true;
 
 const levels = [
@@ -44,6 +45,7 @@ const gameState = {
   mismatchTimeoutId: null,
   autoAdvanceTimeoutId: null,
   highestUnlockedLevel: 1,
+  completedLevels: new Set(),
   animatingTileIds: [],
   displayPairs: null
 };
@@ -164,7 +166,7 @@ function getViewportMetrics() {
   const minTileWidth = isCompact ? MIN_TILE_WIDTH_COMPACT : MIN_TILE_WIDTH_DESKTOP;
   const screenStyle = getComputedStyle(dom.gameScreen);
   const screenPaddingH = parseFloat(screenStyle.paddingLeft) + parseFloat(screenStyle.paddingRight);
-  const availableWidth = Math.max(140, dom.gameScreen.clientWidth - screenPaddingH);
+  const availableWidth = Math.max(140, dom.gameScreen.clientWidth - screenPaddingH - 2);
   const boardTop = dom.gameBoard.getBoundingClientRect().top;
   const controlsHeight = dom.gameControls ? dom.gameControls.offsetHeight : 0;
   const safetyBottomSpace = isCompact ? 16 : 24;
@@ -187,7 +189,7 @@ function findBestColumns(pairs, metrics) {
     const tileWidthByHeight = (availableHeight - gapPx * (rows - 1)) / (rows * TILE_ASPECT);
     const tileWidth = Math.floor(Math.min(tileWidthByWidth, tileWidthByHeight));
     if (tileWidth < minTileWidth) continue;
-    if (tileWidth >= bestTileWidth) {
+    if (tileWidth > bestTileWidth) {
       bestTileWidth = tileWidth;
       bestColumns = columns;
     }
@@ -212,8 +214,10 @@ function fitBoardToViewport() {
   if (!level) return;
   const displayPairs = gameState.displayPairs ?? level.pairs;
   const metrics = getViewportMetrics();
-  const result = findBestColumns(displayPairs, metrics);
-  if (!result) return;
+  let result = findBestColumns(displayPairs, metrics);
+  if (!result) {
+    result = { columns: 2, tileWidth: metrics.minTileWidth };
+  }
   const tileHeight = Math.floor(result.tileWidth * TILE_ASPECT);
   dom.gameBoard.style.setProperty("--columns", String(result.columns));
   dom.gameBoard.style.setProperty("--board-gap", `${metrics.gapPx}px`);
@@ -247,8 +251,10 @@ function renderLevelSelect() {
     const isUnlocked = level.id <= unlockedThreshold;
     button.classList.add("level-button");
 
+    const isCompleted = gameState.completedLevels.has(level.id);
     button.textContent = isUnlocked ? `Level ${level.id}` : `Level ${level.id} Locked`;
     if (!isUnlocked) button.classList.add("is-locked");
+    if (isCompleted) button.classList.add("is-completed");
     button.disabled = !isUnlocked;
 
     button.addEventListener("click", () => startLevel(level.id));
@@ -489,30 +495,24 @@ function completeLevel() {
   gameState.phase = "won";
   gameState.isBoardLocked = true;
 
+  gameState.completedLevels.add(gameState.currentLevelId);
   unlockNextLevel();
-
-  dom.levelCompleteMessage.textContent =
-    gameState.currentLevelId === levels.length
-      ? "You completed all levels."
-      : `Level ${gameState.currentLevelId} complete.`;
+  saveProgress();
 
   const isLastLevel = gameState.currentLevelId === levels.length;
-
-  if (isLastLevel) {
-    dom.nextLevelButton.classList.add("hidden");
-  } else {
-    dom.nextLevelButton.classList.remove("hidden");
-  }
-
-  showScreen("complete");
 
   if (!isLastLevel) {
     const nextLevelId = gameState.currentLevelId + 1;
     gameState.autoAdvanceTimeoutId = setTimeout(() => {
       gameState.autoAdvanceTimeoutId = null;
       startLevel(nextLevelId);
-    }, 2000);
+    }, 800);
+    return;
   }
+
+  dom.levelCompleteMessage.textContent = "You completed all levels.";
+  dom.nextLevelButton.classList.add("hidden");
+  showScreen("complete");
 }
 
 function handleMatch() {
@@ -624,10 +624,13 @@ function stopTimer() {
 function loadProgress() {
   const savedLevel = Number(localStorage.getItem(STORAGE_KEY));
   gameState.highestUnlockedLevel = savedLevel || 1;
+  const savedCompleted = JSON.parse(localStorage.getItem(COMPLETED_KEY) || "[]");
+  gameState.completedLevels = new Set(savedCompleted);
 }
 
 function saveProgress() {
   localStorage.setItem(STORAGE_KEY, String(gameState.highestUnlockedLevel));
+  localStorage.setItem(COMPLETED_KEY, JSON.stringify([...gameState.completedLevels]));
 }
 
 function backToLevelSelect() {
