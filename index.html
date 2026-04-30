@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Tiles</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section id="level-select-screen" class="screen">
+        <h1>Memory Tiles</h1>
+        <p>Choose an unlocked level.</p>
+        <div id="level-list" class="level-list"></div>
+      </section>
+
+      <section id="game-screen" class="screen hidden">
+        <header class="game-header">
+          <div>Level <span id="level-number"></span></div>
+          <div>Moves: <span id="moves-used">0</span><span id="move-limit"></span></div>
+          <div id="timer-display" class="hidden">Time: <span id="time-remaining"></span></div>
+        </header>
+
+        <p id="status-message" class="status-message"></p>
+
+        <div id="game-board" class="game-board"></div>
+
+        <div class="game-controls">
+          <button id="restart-level-button">Restart Level</button>
+          <button id="back-to-levels-button">Back to Levels</button>
+        </div>
+      </section>
+
+      <section id="level-complete-screen" class="screen hidden">
+        <h2>Level Complete</h2>
+        <p id="level-complete-message"></p>
+        <div class="screen-actions">
+          <button id="next-level-button">Next Level</button>
+          <button id="replay-level-button">Replay Level</button>
+          <button id="complete-back-button">Back to Levels</button>
+        </div>
+      </section>
+
+      <section id="retry-screen" class="screen hidden">
+        <h2>Try Again</h2>
+        <p id="failure-message"></p>
+        <div class="screen-actions">
+          <button id="retry-button">Retry</button>
+          <button id="retry-back-button">Back to Levels</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

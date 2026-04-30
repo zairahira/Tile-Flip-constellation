@@ -1,0 +1,153 @@
+:root {
+  color-scheme: light;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f6f8fb 0%, #e8eef9 100%);
+  color: #101827;
+}
+
+.app {
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.screen {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 12px 36px rgba(10, 24, 52, 0.08);
+  padding: 1.2rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.level-list {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+button {
+  border: 0;
+  border-radius: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  font: inherit;
+  background: #165ef0;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.level-button.is-locked {
+  background: #9ca3af;
+}
+
+.game-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.status-message {
+  min-height: 1.25rem;
+  margin: 0 0 1rem;
+  color: #334155;
+}
+
+.game-board {
+  --columns: 4;
+  --tile-size: 96px;
+  --board-gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--tile-size));
+  gap: var(--board-gap);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border: 0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  background: #1f2937;
+  transform-style: preserve-3d;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.tile:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.tile.is-hidden {
+  background: #1f2937;
+}
+
+.tile.is-flipped,
+.tile.is-matched {
+  background: var(--tile-color);
+}
+
+.tile.is-just-flipped {
+  animation: tile-flip-show 240ms ease;
+}
+
+.tile.is-matched {
+  outline: 3px solid rgba(255, 255, 255, 0.75);
+  cursor: default;
+}
+
+.tile:disabled {
+  cursor: default;
+}
+
+@keyframes tile-flip-show {
+  0% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+.game-controls,
+.screen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 720px) {
+  .app {
+    padding: 0.75rem;
+  }
+
+  .screen {
+    padding: 0.95rem;
+  }
+
+  .game-board {
+    --board-gap: 0.5rem;
+  }
+}
