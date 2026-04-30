@@ -1,6 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+
+html {
+  font-size: 18px;
+}
+
 :root {
-  color-scheme: light;
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  --bg-primary: #0a0a23;
+  --bg-secondary: #1b1b32;
+  --bg-surface: #2a2a40;
+  --border: #3b3b4f;
+  --text-muted: #858591;
+  --text-secondary: #dfdfe2;
+  --text-primary: #f5f6f7;
+  --text-bright: #ffffff;
+  --yellow: #f1be32;
+  --blue: #99c9ff;
+  --green: #acd157;
+  --red: #ffadad;
+  --purple: #dbb8ff;
+  --focus: #198eee;
+
+  color-scheme: dark;
+  font-family: Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
 }
 
 * {
@@ -10,25 +32,141 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(180deg, #f6f8fb 0%, #e8eef9 100%);
-  color: #101827;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .app {
-  width: min(100%, 920px);
+  width: min(100%, 960px);
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1.5rem 1rem;
 }
 
+/* Screens */
 .screen {
-  background: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 12px 36px rgba(10, 24, 52, 0.08);
-  padding: 1.2rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 1.5rem;
 }
 
 .hidden {
   display: none;
+}
+
+/* App toolbar */
+.app-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.icon-link,
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 120ms ease, background 120ms ease;
+}
+
+.icon-link:hover,
+.icon-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.icon-link:focus-visible,
+.icon-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* How to play modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 35, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 1.5rem;
+  max-width: 480px;
+  width: calc(100% - 2rem);
+}
+
+.modal h2 {
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+  color: var(--text-bright);
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.modal h2::before {
+  content: "? ";
+  color: var(--purple);
+}
+
+.modal ul {
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#close-modal-button {
+  background: var(--yellow);
+  color: var(--bg-primary);
+  border-color: var(--yellow);
+  font-weight: 700;
+}
+
+#close-modal-button:hover {
+  background: #ffd24a;
+  border-color: #ffd24a;
+}
+
+/* Level select */
+#level-select-screen h1 {
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+  color: var(--text-bright);
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+#level-select-screen h1::before {
+  content: "> ";
+  color: var(--green);
+}
+
+#level-select-screen > p {
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
 }
 
 .level-list {
@@ -38,39 +176,106 @@ body {
   gap: 0.75rem;
 }
 
+/* Buttons - base */
 button {
-  border: 0;
-  border-radius: 0.6rem;
-  padding: 0.65rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 0.3rem;
+  padding: 0.6rem 1rem;
   font: inherit;
-  background: #165ef0;
-  color: #ffffff;
   cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  line-height: 1.4;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 button:disabled {
   cursor: default;
-  opacity: 0.5;
+}
+
+/* Level select buttons */
+.level-button {
+  background: var(--bg-surface);
+  color: var(--blue);
+  border-color: var(--border);
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+  text-align: center;
+}
+
+.level-button:not(:disabled):hover {
+  border-color: var(--blue);
+  background: var(--bg-primary);
 }
 
 .level-button.is-locked {
-  background: #9ca3af;
+  color: var(--text-muted);
+  opacity: 0.55;
 }
 
+/* Primary CTA buttons - yellow */
+#next-level-button,
+#retry-button {
+  background: var(--yellow);
+  color: var(--bg-primary);
+  border-color: var(--yellow);
+  font-weight: 700;
+}
+
+#next-level-button:hover,
+#retry-button:hover {
+  background: #ffd24a;
+  border-color: #ffd24a;
+}
+
+/* Secondary / ghost buttons */
+#restart-level-button,
+#back-to-levels-button,
+#replay-level-button,
+#complete-back-button,
+#retry-back-button {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+#restart-level-button:hover,
+#back-to-levels-button:hover,
+#replay-level-button:hover,
+#complete-back-button:hover,
+#retry-back-button:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-bright);
+}
+
+/* Game header */
 .game-header {
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
   justify-content: space-between;
   margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+  color: var(--text-muted);
 }
 
+.game-header span {
+  color: var(--text-primary);
+}
+
+/* Status message */
 .status-message {
-  min-height: 1.25rem;
+  min-height: 1.5rem;
   margin: 0 0 1rem;
-  color: #334155;
+  color: var(--text-muted);
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
 }
 
+/* Game board */
 .game-board {
   --columns: 4;
   --tile-size: 96px;
@@ -83,29 +288,36 @@ button:disabled {
   margin: 0 auto;
 }
 
+/* Tiles */
 .tile {
   width: var(--tile-size);
   height: var(--tile-size);
-  border: 0;
-  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
   cursor: pointer;
-  background: #1f2937;
+  background: var(--bg-surface);
   transform-style: preserve-3d;
-  transition: transform 120ms ease, filter 120ms ease;
+  transition: transform 120ms ease, filter 120ms ease, border-color 120ms ease;
 }
 
 .tile:hover:not(:disabled) {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
+  transform: translateY(-2px);
+  border-color: var(--blue);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .tile.is-hidden {
-  background: #1f2937;
+  background: var(--bg-surface);
 }
 
 .tile.is-flipped,
 .tile.is-matched {
   background: var(--tile-color);
+  border-color: transparent;
 }
 
 .tile.is-just-flipped {
@@ -113,11 +325,13 @@ button:disabled {
 }
 
 .tile.is-matched {
-  outline: 3px solid rgba(255, 255, 255, 0.75);
+  outline: 2px solid var(--green);
+  outline-offset: 1px;
   cursor: default;
+  opacity: 0.85;
 }
 
-.tile:disabled {
+.tile:disabled:not(.is-matched) {
   cursor: default;
 }
 
@@ -130,12 +344,43 @@ button:disabled {
   }
 }
 
+/* Controls */
 .game-controls,
 .screen-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
+}
+
+/* Complete screen */
+#level-complete-screen h2 {
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+  color: var(--green);
+  font-size: 1.5rem;
+  margin: 0 0 0.75rem;
+}
+
+#level-complete-screen h2::before {
+  content: "[OK] ";
+}
+
+/* Retry screen */
+#retry-screen h2 {
+  font-family: "Fira Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+  color: var(--red);
+  font-size: 1.5rem;
+  margin: 0 0 0.75rem;
+}
+
+#retry-screen h2::before {
+  content: "[!] ";
+}
+
+#level-complete-message,
+#failure-message {
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
 }
 
 @media (max-width: 720px) {
@@ -144,10 +389,16 @@ button:disabled {
   }
 
   .screen {
-    padding: 0.95rem;
+    padding: 1rem;
   }
 
   .game-board {
     --board-gap: 0.5rem;
+  }
+}
+
+@media (max-width: 500px) {
+  html {
+    font-size: 16px;
   }
 }

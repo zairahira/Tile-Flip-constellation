@@ -84,6 +84,20 @@ function cacheDomElements() {
 
   dom.levelCompleteMessage = document.querySelector("#level-complete-message");
   dom.failureMessage = document.querySelector("#failure-message");
+
+  dom.howToPlayButton = document.querySelector("#how-to-play-button");
+  dom.howToPlayModal = document.querySelector("#how-to-play-modal");
+  dom.closeModalButton = document.querySelector("#close-modal-button");
+}
+
+function openModal() {
+  dom.howToPlayModal.classList.remove("hidden");
+  dom.closeModalButton.focus();
+}
+
+function closeModal() {
+  dom.howToPlayModal.classList.add("hidden");
+  dom.howToPlayButton.focus();
 }
 
 function ensureAudioContext() {
@@ -596,7 +610,18 @@ function backToLevelSelect() {
 
 function attachEventListeners() {
   document.addEventListener("pointerdown", unlockAudio, { once: true });
-  document.addEventListener("keydown", unlockAudio, { once: true });
+  document.addEventListener("keydown", (e) => {
+    unlockAudio();
+    if (e.key === "Escape" && !dom.howToPlayModal.classList.contains("hidden")) {
+      closeModal();
+    }
+  }, { once: false });
+
+  dom.howToPlayButton.addEventListener("click", openModal);
+  dom.closeModalButton.addEventListener("click", closeModal);
+  dom.howToPlayModal.addEventListener("click", (e) => {
+    if (e.target === dom.howToPlayModal) closeModal();
+  });
   dom.restartLevelButton.addEventListener("click", () => {
     if (gameState.currentLevelId) startLevel(gameState.currentLevelId);
   });
