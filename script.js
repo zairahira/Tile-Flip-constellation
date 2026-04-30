@@ -49,7 +49,8 @@ const gameState = {
   pairResolveTimeoutId: null,
   mismatchTimeoutId: null,
   highestUnlockedLevel: 1,
-  animatingTileIds: []
+  animatingTileIds: [],
+  displayPairs: null
 };
 
 const dom = {};
@@ -158,57 +159,71 @@ function playMismatchSound() {
   }, 45);
 }
 
-function fitBoardToViewport(level) {
-  if (!level || !dom.gameBoard || !dom.gameScreen) return;
+const TILE_ASPECT = 4 / 3; // height / width (portrait)
+const MIN_TILE_WIDTH_DESKTOP = 90;
+const MIN_TILE_WIDTH_COMPACT = 62;
 
-  const totalTiles = level.pairs * 2;
+function getViewportMetrics() {
   const isCompact = window.innerWidth <= 720;
   const gapPx = isCompact ? 8 : 12;
-  const boardHorizontalPadding = 8;
-  const minTileSize = isCompact ? 34 : 42;
-
-  const screenRect = dom.gameScreen.getBoundingClientRect();
-  const availableWidth = Math.max(140, screenRect.width - boardHorizontalPadding * 2);
+  const minTileWidth = isCompact ? MIN_TILE_WIDTH_COMPACT : MIN_TILE_WIDTH_DESKTOP;
+  const screenStyle = getComputedStyle(dom.gameScreen);
+  const screenPaddingH = parseFloat(screenStyle.paddingLeft) + parseFloat(screenStyle.paddingRight);
+  const availableWidth = Math.max(140, dom.gameScreen.clientWidth - screenPaddingH);
   const boardTop = dom.gameBoard.getBoundingClientRect().top;
   const controlsHeight = dom.gameControls ? dom.gameControls.offsetHeight : 0;
   const safetyBottomSpace = isCompact ? 16 : 24;
-  const availableHeight = Math.max(
-    140,
-    window.innerHeight - boardTop - controlsHeight - safetyBottomSpace
-  );
+  const availableHeight = Math.max(140, window.innerHeight - boardTop - controlsHeight - safetyBottomSpace);
+  return { isCompact, gapPx, minTileWidth, availableWidth, availableHeight };
+}
 
-  const widthLimitedMaxColumns = Math.max(
-    level.columns,
-    Math.floor((availableWidth + gapPx) / (minTileSize + gapPx))
-  );
-  const maxColumns = Math.min(totalTiles, widthLimitedMaxColumns);
+function findBestColumns(pairs, metrics) {
+  const { gapPx, minTileWidth, availableWidth, availableHeight } = metrics;
+  const totalTiles = pairs * 2;
+  const maxColumns = Math.floor(totalTiles / 2); // at least 2 rows
 
-  let bestColumns = level.columns;
-  let bestTileSize = 0;
+  let bestColumns = 0;
+  let bestTileWidth = 0;
 
-  for (let columns = level.columns; columns <= maxColumns; columns += 1) {
-    const rows = Math.ceil(totalTiles / columns);
-    const tileSizeByWidth = (availableWidth - gapPx * (columns - 1)) / columns;
-    const tileSizeByHeight = (availableHeight - gapPx * (rows - 1)) / rows;
-    const tileSize = Math.floor(Math.min(tileSizeByWidth, tileSizeByHeight));
-
-    if (tileSize < minTileSize) continue;
-    if (tileSize >= bestTileSize) {
-      bestTileSize = tileSize;
+  for (let columns = 2; columns <= maxColumns; columns++) {
+    if (totalTiles % columns !== 0) continue;
+    const rows = totalTiles / columns;
+    const tileWidthByWidth = (availableWidth - gapPx * (columns - 1)) / columns;
+    const tileWidthByHeight = (availableHeight - gapPx * (rows - 1)) / (rows * TILE_ASPECT);
+    const tileWidth = Math.floor(Math.min(tileWidthByWidth, tileWidthByHeight));
+    if (tileWidth < minTileWidth) continue;
+    if (tileWidth >= bestTileWidth) {
+      bestTileWidth = tileWidth;
       bestColumns = columns;
     }
   }
 
-  if (bestTileSize === 0) {
-    const fallbackRows = Math.ceil(totalTiles / level.columns);
-    const tileSizeByWidth = (availableWidth - gapPx * (level.columns - 1)) / level.columns;
-    const tileSizeByHeight = (availableHeight - gapPx * (fallbackRows - 1)) / fallbackRows;
-    bestTileSize = Math.floor(Math.max(minTileSize, Math.min(tileSizeByWidth, tileSizeByHeight)));
-  }
+  return bestColumns > 0 ? { columns: bestColumns, tileWidth: bestTileWidth } : null;
+}
 
-  dom.gameBoard.style.setProperty("--columns", String(bestColumns));
-  dom.gameBoard.style.setProperty("--board-gap", `${gapPx}px`);
-  dom.gameBoard.style.setProperty("--tile-size", `${bestTileSize}px`);
+function computeLayout(level) {
+  if (!dom.gameBoard || !dom.gameScreen) return null;
+  const metrics = getViewportMetrics();
+  for (let pairs = level.pairs; pairs >= 2; pairs--) {
+    const result = findBestColumns(pairs, metrics);
+    if (result) return { displayPairs: pairs, ...result };
+  }
+  return { displayPairs: 2, columns: 2, tileWidth: metrics.minTileWidth };
+}
+
+function fitBoardToViewport() {
+  if (!dom.gameBoard || !dom.gameScreen) return;
+  const level = getLevelById(gameState.currentLevelId);
+  if (!level) return;
+  const displayPairs = gameState.displayPairs ?? level.pairs;
+  const metrics = getViewportMetrics();
+  const result = findBestColumns(displayPairs, metrics);
+  if (!result) return;
+  const tileHeight = Math.floor(result.tileWidth * TILE_ASPECT);
+  dom.gameBoard.style.setProperty("--columns", String(result.columns));
+  dom.gameBoard.style.setProperty("--board-gap", `${metrics.gapPx}px`);
+  dom.gameBoard.style.setProperty("--tile-width", `${result.tileWidth}px`);
+  dom.gameBoard.style.setProperty("--tile-height", `${tileHeight}px`);
 }
 
 function showScreen(screenName) {
@@ -273,8 +288,8 @@ function clearActiveTimeouts() {
   }
 }
 
-function generateTiles(level) {
-  const selectedColors = colorPool.slice(0, level.pairs);
+function generateTiles(level, pairs) {
+  const selectedColors = colorPool.slice(0, pairs ?? level.pairs);
   const tiles = [];
 
   selectedColors.forEach((color, index) => {
@@ -315,7 +330,7 @@ function renderGameHeader(level) {
 
 function renderBoard(level) {
   dom.gameBoard.innerHTML = "";
-  fitBoardToViewport(level);
+  fitBoardToViewport();
 
   gameState.tiles.forEach((tile) => {
     const tileButton = document.createElement("button");
@@ -408,7 +423,6 @@ function startLevel(levelId) {
 
   gameState.currentLevelId = level.id;
   gameState.phase = "preview";
-  gameState.tiles = generateTiles(level);
   gameState.firstTile = null;
   gameState.secondTile = null;
   gameState.isBoardLocked = true;
@@ -418,8 +432,13 @@ function startLevel(levelId) {
   setAnimatingTiles([]);
 
   renderGameHeader(level);
-  renderBoard(level);
   showScreen("game");
+
+  const layout = computeLayout(level);
+  gameState.displayPairs = layout ? layout.displayPairs : level.pairs;
+  gameState.tiles = generateTiles(level, gameState.displayPairs);
+
+  renderBoard(level);
   startPreview(level);
 }
 
@@ -431,7 +450,7 @@ function clearSelectedTiles() {
 function hasWonLevel() {
   const level = getLevelById(gameState.currentLevelId);
   if (!level) return false;
-  return gameState.matchedPairs === level.pairs;
+  return gameState.matchedPairs === (gameState.displayPairs ?? level.pairs);
 }
 
 function failLevel(reason) {
@@ -651,9 +670,7 @@ function attachEventListeners() {
 
   window.addEventListener("resize", () => {
     if (gameState.phase === "levelSelect") return;
-    const level = getLevelById(gameState.currentLevelId);
-    if (!level) return;
-    fitBoardToViewport(level);
+    fitBoardToViewport();
   });
 }
 
