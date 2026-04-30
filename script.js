@@ -42,6 +42,7 @@ const gameState = {
   previewIntervalId: null,
   pairResolveTimeoutId: null,
   mismatchTimeoutId: null,
+  autoAdvanceTimeoutId: null,
   highestUnlockedLevel: 1,
   animatingTileIds: [],
   displayPairs: null
@@ -280,6 +281,10 @@ function clearActiveTimeouts() {
     clearTimeout(gameState.mismatchTimeoutId);
     gameState.mismatchTimeoutId = null;
   }
+  if (gameState.autoAdvanceTimeoutId) {
+    clearTimeout(gameState.autoAdvanceTimeoutId);
+    gameState.autoAdvanceTimeoutId = null;
+  }
 }
 
 function generateTiles(level, pairs) {
@@ -372,6 +377,7 @@ function startPreview(level) {
   gameState.isBoardLocked = true;
   let previewSecondsRemaining = level.previewSeconds;
   dom.statusMessage.textContent = `Memorize the tiles (${previewSecondsRemaining})`;
+  dom.statusMessage.classList.add("is-preview");
 
   gameState.tiles.forEach((tile) => {
     tile.isFlipped = true;
@@ -400,6 +406,7 @@ function startPreview(level) {
 
     gameState.phase = "playing";
     gameState.isBoardLocked = false;
+    dom.statusMessage.classList.remove("is-preview");
     dom.statusMessage.textContent = "Find all matching pairs";
 
     updateBoard();
@@ -489,13 +496,23 @@ function completeLevel() {
       ? "You completed all levels."
       : `Level ${gameState.currentLevelId} complete.`;
 
-  if (gameState.currentLevelId === levels.length) {
+  const isLastLevel = gameState.currentLevelId === levels.length;
+
+  if (isLastLevel) {
     dom.nextLevelButton.classList.add("hidden");
   } else {
     dom.nextLevelButton.classList.remove("hidden");
   }
 
   showScreen("complete");
+
+  if (!isLastLevel) {
+    const nextLevelId = gameState.currentLevelId + 1;
+    gameState.autoAdvanceTimeoutId = setTimeout(() => {
+      gameState.autoAdvanceTimeoutId = null;
+      startLevel(nextLevelId);
+    }, 2000);
+  }
 }
 
 function handleMatch() {
