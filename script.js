@@ -14,23 +14,17 @@ const levels = [
   { id: 10, pairs: 16, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120 }
 ];
 
+const symbolPool = [
+  "★", "●", "▲", "■", "◆", "♠",
+  "♣", "♥", "♦", "◉", "▼", "▶",
+  "◀", "⬡", "✦", "◈"
+];
+
 const colorPool = [
-  "#ef4444",
-  "#f97316",
-  "#f59e0b",
-  "#84cc16",
-  "#22c55e",
-  "#14b8a6",
-  "#06b6d4",
-  "#3b82f6",
-  "#6366f1",
-  "#8b5cf6",
-  "#a855f7",
-  "#d946ef",
-  "#ec4899",
-  "#f43f5e",
-  "#64748b",
-  "#0f766e"
+  "#2d1515", "#2d1f0d", "#2a2710", "#132913",
+  "#0d2420", "#0d1e29", "#0d1429", "#150d29",
+  "#1e0d29", "#260d2a", "#290d22", "#290d14",
+  "#1a1a2a", "#0d2419", "#23200d", "#2a150d"
 ];
 
 const gameState = {
@@ -289,14 +283,15 @@ function clearActiveTimeouts() {
 }
 
 function generateTiles(level, pairs) {
-  const selectedColors = colorPool.slice(0, pairs ?? level.pairs);
+  const selectedSymbols = symbolPool.slice(0, pairs ?? level.pairs);
   const tiles = [];
 
-  selectedColors.forEach((color, index) => {
+  selectedSymbols.forEach((symbol, index) => {
     const pairId = `pair-${index + 1}`;
+    const color = colorPool[index];
 
-    tiles.push({ id: `${pairId}-a`, pairId, color, isFlipped: true, isMatched: false });
-    tiles.push({ id: `${pairId}-b`, pairId, color, isFlipped: true, isMatched: false });
+    tiles.push({ id: `${pairId}-a`, pairId, symbol, color, isFlipped: true, isMatched: false });
+    tiles.push({ id: `${pairId}-b`, pairId, symbol, color, isFlipped: true, isMatched: false });
   });
 
   return shuffleTiles(tiles);
@@ -337,6 +332,7 @@ function renderBoard(level) {
     tileButton.classList.add("tile");
     tileButton.dataset.tileId = tile.id;
     tileButton.setAttribute("aria-label", "Memory tile");
+    tileButton.textContent = tile.isFlipped ? tile.symbol : "";
     tileButton.style.setProperty("--tile-color", tile.color);
 
     if (tile.isFlipped) {
