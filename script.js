@@ -3,16 +3,26 @@ const COMPLETED_KEY = "matchingTilesCompletedLevels";
 const UNLOCK_ALL_FOR_TESTING = true;
 
 const levels = [
-  { id: 1, pairs: 6, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
-  { id: 2, pairs: 8, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
-  { id: 3, pairs: 10, columns: 5, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
-  { id: 4, pairs: 10, columns: 5, previewSeconds: 4, maxMoves: 30, timeLimitSeconds: null },
-  { id: 5, pairs: 12, columns: 4, previewSeconds: 4, maxMoves: 34, timeLimitSeconds: null },
-  { id: 6, pairs: 12, columns: 4, previewSeconds: 4, maxMoves: 30, timeLimitSeconds: null },
-  { id: 7, pairs: 14, columns: 4, previewSeconds: 4, maxMoves: 38, timeLimitSeconds: null },
-  { id: 8, pairs: 14, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120 },
-  { id: 9, pairs: 16, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120 },
-  { id: 10, pairs: 16, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120 }
+  { id: 1,  pairs: 6,  columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
+  { id: 2,  pairs: 8,  columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
+  { id: 3,  pairs: 10, columns: 5, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
+  { id: 4,  pairs: 10, columns: 5, previewSeconds: 4, maxMoves: 30,   timeLimitSeconds: null },
+  { id: 5,  pairs: 12, columns: 4, previewSeconds: 4, maxMoves: 34,   timeLimitSeconds: null },
+  { id: 6,  pairs: 12, columns: 4, previewSeconds: 4, maxMoves: 30,   timeLimitSeconds: null },
+  { id: 7,  pairs: 14, columns: 4, previewSeconds: 4, maxMoves: 38,   timeLimitSeconds: null },
+  { id: 8,  pairs: 14, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120  },
+  { id: 9,  pairs: 16, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120  },
+  { id: 10, pairs: 16, columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: 120  },
+  { id: 11, pairs: 16, columns: 4, previewSeconds: 3, maxMoves: null, timeLimitSeconds: 100  },
+  { id: 12, pairs: 16, columns: 4, previewSeconds: 3, maxMoves: 38,   timeLimitSeconds: null },
+  { id: 13, pairs: 14, columns: 4, previewSeconds: 2, maxMoves: null, timeLimitSeconds: 90   },
+  { id: 14, pairs: 16, columns: 4, previewSeconds: 4, maxMoves: 40,   timeLimitSeconds: 120  },
+  { id: 15, pairs: 16, columns: 4, previewSeconds: 3, maxMoves: 38,   timeLimitSeconds: 100  },
+  { id: 16, pairs: 16, columns: 4, previewSeconds: 2, maxMoves: 36,   timeLimitSeconds: 90   },
+  { id: 17, pairs: 16, columns: 4, previewSeconds: 2, maxMoves: null, timeLimitSeconds: 120  },
+  { id: 18, pairs: 16, columns: 4, previewSeconds: 2, maxMoves: 38,   timeLimitSeconds: 90   },
+  { id: 19, pairs: 16, columns: 4, previewSeconds: 2, maxMoves: 36,   timeLimitSeconds: 75   },
+  { id: 20, pairs: 16, columns: 4, previewSeconds: 2, maxMoves: 34,   timeLimitSeconds: 60   }
 ];
 
 const symbolPool = [
