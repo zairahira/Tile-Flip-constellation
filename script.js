@@ -1,6 +1,6 @@
 const STORAGE_KEY = "matchingTilesHighestUnlockedLevel";
 const COMPLETED_KEY = "matchingTilesCompletedLevels";
-const UNLOCK_ALL_FOR_TESTING = true;
+const UNLOCK_ALL_FOR_TESTING = false;
 
 const levels = [
   { id: 1,  pairs: 6,  columns: 4, previewSeconds: 4, maxMoves: null, timeLimitSeconds: null },
@@ -262,7 +262,9 @@ function renderLevelSelect() {
     button.classList.add("level-button");
 
     const isCompleted = gameState.completedLevels.has(level.id);
-    button.textContent = isUnlocked ? `Level ${level.id}` : `Level ${level.id} Locked`;
+    button.innerHTML = isUnlocked
+      ? `Level ${level.id}`
+      : `Level ${level.id} <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-left:2px"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
     if (!isUnlocked) button.classList.add("is-locked");
     if (isCompleted) button.classList.add("is-completed");
     button.disabled = !isUnlocked;

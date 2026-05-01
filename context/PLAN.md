@@ -46,7 +46,7 @@ Create these main areas in `index.html`:
 ```html
 <main class="app">
   <section id="level-select-screen" class="screen">
-    <h1>Memory Tiles</h1>
+    <h1>Tile Flip</h1>
     <p>Choose an unlocked level.</p>
     <div id="level-list" class="level-list"></div>
   </section>
